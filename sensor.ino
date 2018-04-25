@@ -4,43 +4,51 @@
  *
  */
 
-#define IR_SENSOR_IN 2
-#define IR_LED_OUT 3
+#define ARRAY_SIZE 8
+
+unsigned int data_new[ARRAY_SIZE];
 
 void setup() {
-    // Interrupts will be used to detect input
-    pinMode(IR_SENSOR_IN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(IR_SENSOR_IN),
-                    receiving_started, RISING);
-
-    pinMode(IR_LED_OUT, OUTPUT);
 
     // For initial testing
     Serial.begin(9600);
-    Serial.println("Still working");
+    Serial.println("Ready To Record");
 }
 
 void loop() {
-    // If we get a signal to send a transmission back out
+    if (analogRead(A0) > 300) {
+        rec_started(data_new);
+        for (int i = 0; i < ARRAY_SIZE; i++)
+            Serial.println(data_new[i]);
+
+        Serial.println("End of pattern");
+        delay(2000);
+    }
 }
 
-struct pattern {
-    int **delays;
+void rec_started(unsigned int array[ARRAY_SIZE]) {
+    //Handle the stuff here
+    
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        array[i] = record_into_int();
+    }
+
 }
 
-/*
- * receiving_started()
- * 
- * Handle the recording of an incoming IR transmission
- *   from a remote control
+int record_into_int() {
+    int int_to_record = 0;
+    int counter = 0;
+    while (counter < 16) {
+        if (analogRead(A0) > 300)
+            int_to_record |= (1 << counter);
+
+        counter++;
+        delayMicroseconds(999);
+    }
+    return int_to_record;
+}
+
+/* Record the pattern into bits that represent every 1000 microseconds
+ * Use an array of 8 ints
  */
-void receiving_started() {
-    // Look at IR_SENSOR_IN, and record it
-    // Also need to disable this ISR until recording done
-    noInterrupts();
-    Serial.print("Rising pin at time: ");
-    Serial.println(micros());
-    interrupts();
-    // Maybe get the time of the first flash, time of second, etc
-    // Put this in an array for later use
-}
+

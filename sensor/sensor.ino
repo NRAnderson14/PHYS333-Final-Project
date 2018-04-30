@@ -93,9 +93,13 @@ Match_Tuple amount_similar(unsigned int array[ARRAY_SIZE]) {
  */
 void print_results(unsigned int array[ARRAY_SIZE]) {
     Match_Tuple res = amount_similar(array);
-    Serial.print("Most similar to: ");
-    Serial.println(pattern_names[res.pattern]);
-    Serial.print("Degrees of similarity: ");
-    Serial.print(res.degrees);
-    Serial.println("/8\n");
+    if (res.degrees > 2) {
+        Serial.print("Most similar to: ");
+        Serial.println(pattern_names[res.pattern]);
+        Serial.print("Degrees of similarity: ");
+        Serial.print(res.degrees);
+        Serial.println("/8\n");
+    } else {
+        Serial.println("Unable to find good match!\n");
+    }
 }

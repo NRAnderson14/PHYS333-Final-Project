@@ -1,43 +1,48 @@
 /* sensor.ino
  * 
- * Detect and record IR patterns from remote controls
+ * Decode IR signals from a remote control,
+ *  and give a guess as to which button was pressed
  *
+ * Nathan Anderson
+ * Physics 333
+ * Spring 2018
  */
+
+// Our patterns to compare against
 #include "patterns.h"
 
+// Size for the arrays we record the signals into
 #define ARRAY_SIZE 8
 
-unsigned int data_new[ARRAY_SIZE];
+unsigned int recording_array[ARRAY_SIZE];
 
 void setup() {
-
-    // For initial testing
     Serial.begin(9600);
     Serial.println("Ready To Record");
 }
 
 void loop() {
     if (analogRead(A0) > 300) {
-        record_into(data_new);
-        for (int i = 0; i < ARRAY_SIZE; i++)
-            Serial.println(data_new[i]);
-
-        print_results(data_new);
+        record_into(recording_array);
+        print_results(recording_array);
         delay(1000);
     }
 }
 
 
-
+// Records the data from the IR sensor into an array
 void record_into(unsigned int array[ARRAY_SIZE]) {
-    //Handle the stuff here
-    
     for (int i = 0; i < ARRAY_SIZE; i++) {
         array[i] = record_into_int();
     }
 
 }
 
+/* Records 16 milliseconds of IR data into one 16-bit integer
+ * Each bit in the integer represents one millisecond, measured
+ *  at its rising edge, where 1 represents a high value and 0 
+ *  a low value
+ */
 int record_into_int() {
     int int_to_record = 0;
     int counter = 0;
@@ -51,8 +56,8 @@ int record_into_int() {
     return int_to_record;
 }
 
-/* Record the pattern into bits that represent every 1000 microseconds
- * Use an array of 8 ints
+/* Determine the amount a given pattern is similar to one of the
+ *  pattern we have previously recorded
  */
 Match_Tuple amount_similar(unsigned int array[ARRAY_SIZE]) {
     int best_match;
@@ -83,6 +88,9 @@ Match_Tuple amount_similar(unsigned int array[ARRAY_SIZE]) {
     return res;
 }
 
+/* Print out the results of a Match_Tuple, taken from a 
+ *  comparison with one of our patterns on file
+ */
 void print_results(unsigned int array[ARRAY_SIZE]) {
     Match_Tuple res = amount_similar(array);
     Serial.print("Most similar to: ");

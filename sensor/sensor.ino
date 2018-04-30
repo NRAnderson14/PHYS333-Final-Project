@@ -18,18 +18,18 @@ void setup() {
 
 void loop() {
     if (analogRead(A0) > 300) {
-        rec_started(data_new);
+        record_into(data_new);
         for (int i = 0; i < ARRAY_SIZE; i++)
             Serial.println(data_new[i]);
 
-        Serial.println("End of pattern");
-        delay(2000);
+        print_results(data_new);
+        delay(1000);
     }
 }
 
 
 
-void rec_started(unsigned int array[ARRAY_SIZE]) {
+void record_into(unsigned int array[ARRAY_SIZE]) {
     //Handle the stuff here
     
     for (int i = 0; i < ARRAY_SIZE; i++) {

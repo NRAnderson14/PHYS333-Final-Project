@@ -55,23 +55,29 @@ int record_into_int() {
  * Use an array of 8 ints
  */
 Match_Tuple amount_similar(unsigned int array[ARRAY_SIZE]) {
-    int pattern_matched;
+    int best_match;
     int degrees_similar = 0;
-    int inner_comp = 0;
+    int inner_matches = 0;
+    int prev_matches = 0;
     Match_Tuple res;
 
-    for (int each_pattern = 0; each_pattern < 5; each_pattern++) {
-        for (int this_patt = 0; this_patt < 8; this_patt++)
-            if (patterns[each_pattern] == array[this_patt])
-                inner_comp++;
-
-        if (inner_comp > degrees_similar) {
-            degrees_similar = inner_comp;
-            pattern_matched = each_pattern;
+    for (int outer = 0; outer < 5; outer++) {
+        for (int inner = 0; inner < 8; inner++) {
+            if (array[inner] == patterns[outer][inner]) {
+                inner_matches++;
+            }
         }
+
+        if (inner_matches > prev_matches) {
+            best_match = outer;
+            prev_matches = inner_matches;
+            degrees_similar = inner_matches;
+        }
+
+        inner_matches = 0;
     }
 
-    res.pattern = pattern_matched;
+    res.pattern = best_match;
     res.degrees = degrees_similar;
 
     return res;
